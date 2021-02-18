@@ -1,0 +1,72 @@
+buildscript {
+    // 定义变量
+    ext {
+        springboot_version = "2.4.2"
+        kotlin_version = '1.3.72'
+        ALI_REPOSITORY_URL = 'https://maven.aliyun.com/repository/public/'
+        ALI_REPOSITORY_PLUGIN_URL = 'https://maven.aliyun.com/repository/gradle-plugin'
+    }
+    repositories {
+        maven { url ALI_REPOSITORY_URL }
+        mavenCentral()
+    }
+
+    // 构建时所需要的插件或者是其他的依赖
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springboot_version}")
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+// 这里定义的一些属性 可以在sub module中通过 rootProject.ext.<attribute>访问
+// 也可以在外部定义一个文件 config.gradle，名字随意，然后 在此文件中 apply from: 'config.gradle'
+ext {
+    a = '1'
+}
+println rootProject.ext.a
+
+apply from: 'config.gradle'
+println rootProject.ext.b
+println rootProject.ext.others.c
+println rootProject.ext.others.d
+println rootProject.ext.e
+
+
+description = "Pure gradle Build"
+defaultTasks 'build'
+
+// 用于多项目构建，包括子module的仓库地址
+allprojects {
+
+    // 声明版本
+    group = 'com.kute'
+    version = '${pureVersion}'
+
+    // 构建生命周期监控，可以在每个项目中单独配置，也可以在allprojects中统一配置
+    beforeEvaluate { project ->
+        println "开始评估 $project"
+    }
+    afterEvaluate { project, state ->
+        println "$project 评估是否成功：${state.failure == null}"
+    }
+}
+
+/* tasks */
+
+//输出所有的仓库地址
+/*task showRepos {
+    doLast {
+        println "All repos:"
+        repositories.each {
+             println "repository: ${it.name} ('${it.url}')"
+        }
+    }
+}*/
+
+// 定制gradle wrapper
+//tasks.named('wrapper') {
+//    distributionType = Wrapper.DistributionType.ALL
+//}
+

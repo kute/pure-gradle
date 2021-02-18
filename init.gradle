@@ -1,0 +1,53 @@
+// 注：该文件 不是放在项目中的，是环境全局配置，这里只为了记录，置于  ~/.gradle/init.d/
+
+initscript {
+    //定义init.gradle所需要的仓库地址
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/public/'
+        }
+        mavenCentral()
+    }
+    //加入一些其他的依赖
+//    dependencies {
+//    }
+}
+
+settingsEvaluated { settings ->
+    settings.pluginManagement {
+//        plugins {
+//        }
+//        resolutionStrategy {
+//        }
+        repositories {
+            mavenCentral()
+            maven {
+                url 'https://maven.aliyun.com/repository/gradle-plugin'
+            }
+            gradlePluginPortal()
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        def ALIYUN_REPOSITORY_URL = 'https://maven.aliyun.com/repository/public/'
+        // 替换 指定仓库
+        all { ArtifactRepository repo ->
+            if (repo instanceof MavenArtifactRepository) {
+                def url = repo.url.toString()
+                if (url.startsWith('https://repo1.maven.org/maven2')) {
+                    project.logger.lifecycle "Repository ${repo.url} replaced by $ALIYUN_REPOSITORY_URL."
+                    remove repo
+                }
+                if (url.startsWith('https://jcenter.bintray.com/')) {
+                    project.logger.lifecycle "Repository ${repo.url} replaced by $ALIYUN_REPOSITORY_URL."
+                    remove repo
+                }
+            }
+        }
+        maven {
+            url ALIYUN_REPOSITORY_URL
+        }
+    }
+}

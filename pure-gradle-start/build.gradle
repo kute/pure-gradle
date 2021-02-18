@@ -1,0 +1,78 @@
+plugins {
+    /* assemble、build和jar等Task都是java插件引入的 */
+    id 'java'
+    id 'java-library'
+    /*
+     * 1、支持打包成可执行应用的插件
+     * 2、https://docs.gradle.org/current/userguide/application_plugin.html
+     * 3、配置 main class 以及 默认jvm 参数
+     */
+    id 'application'
+    id 'org.springframework.boot'
+    /*
+    * https://plugins.gradle.org/plugin/io.spring.dependency-management
+    *
+    */
+    id 'io.spring.dependency-management'
+}
+
+description = "pure-gradle-start"
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+/*依赖相关*/
+
+// 依赖scope配置
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+//项目依赖管理
+dependencyManagement {
+
+}
+
+dependencies {
+    implementation(project(':pure-gradle-core')) {
+        because 'start依赖core module'
+    }
+    // 这里不用写版本号，因为plugin里有依赖管理的插件
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation('org.hibernate:hibernate') {
+        version {
+            strictly '3.1'
+        }
+
+        //excluding a particular transitive dependency:
+        exclude module: 'cglib' //by artifact name
+        exclude group: 'org.jmock' //by group
+        exclude group: 'org.unwanted', module: 'iAmBuggy' //by both name and group
+
+        //disabling all transitive dependencies of this dependency
+        transitive = false
+    }
+
+//    implementation('org.slf4j:slf4j-api:[1.7, 1.8[!!1.7.25')
+    // is equivalent to
+    implementation('org.slf4j:slf4j-api') {
+        version {
+            strictly '[1.7, 1.8['
+            prefer '1.7.25'
+        }
+    }
+
+    // testCompile已过时，使用 testImplementation替代
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+// application插件的配置
+application {
+    mainClass = 'com.kute.puregradle.PureGradleApplication'
+    applicationDefaultJvmArgs = ['-Dgreeting.language=en']
+}

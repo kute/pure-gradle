@@ -1,0 +1,110 @@
+// 插件管理
+pluginManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://maven.aliyun.com/repository/gradle-plugin'
+        }
+        gradlePluginPortal()
+        // pureVersion 读取的gradle.properties里的属性
+        println "settings.gradle current version is snapshot=${pureVersion}"
+        if (pureVersion.endsWith('-SNAPSHOT')) {
+            /*maven {
+                url "https://repo.spring.io/snapshot"
+            }*/
+        }
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "org.jetbrains.kotlin.jvm") {
+                // 读取的gradle.properties里的属性
+                useVersion "${kotlinVersion}"
+            }
+        }
+    }
+    // 配置统一的插件
+    plugins {
+        id 'org.springframework.boot' version '2.4.2'
+        id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+        // 用于构建审视，可视化分析构建过程：https://docs.gradle.com/enterprise/gradle-plugin/
+        id "com.gradle.enterprise" version "${gradleEnterpriseVersion}"
+    }
+}
+
+plugins {
+    id "com.gradle.enterprise"
+}
+
+// 构建审视配置
+gradleEnterprise {
+    // configuration
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+
+        // default true
+        uploadInBackground = false
+
+        // 1. 每次 build之后都上传，无需添加 --scan参数
+//        publishAlways()
+
+        // 2. 当构建失败时上传
+        // publishOnFailure()
+
+        // 3. 条件为真时上传
+//        publishAlwaysIf(condition)
+
+        // 4. 条件为真 且 构建失败时上传
+//        publishOnFailureIf(condition)
+
+        // 5. 自定义判断
+        /*if (condition) {
+            publishAlways()
+        }*/
+    }
+}
+
+rootProject.name = 'pure-gradle'
+
+settings.gradle.projectsLoaded {
+    gradleEnterprise {
+        buildScan {
+            if (settings.gradle.rootProject.hasProperty('buildJavaHome')) {
+                value('Build Java home', settings.gradle.rootProject.getProperty('buildJavaHome'))
+            }
+
+            settings.gradle.rootProject.getBuildDir().mkdirs()
+            new File(settings.gradle.rootProject.getBuildDir(), "build-scan-uri.txt").text = "build scan not generated"
+
+            buildScanPublished { scan ->
+                new File(settings.gradle.rootProject.getBuildDir(), "build-scan-uri.txt").text = "<${scan.buildScanUri}|build scan>\n"
+            }
+        }
+    }
+}
+
+// 新版本提供的全局仓库配置管理
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/public/'
+            // 过滤
+//            /*content {
+//                includeGroup "my.company"
+//                excludeGroupByRegex "my\\.company.*"
+//            }*/
+//            // release or snapshots 过滤
+//            /*mavenContent {
+//                releasesOnly()
+//                snapshotsOnly()
+//            }*/
+        }
+        mavenCentral()
+    }
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+}
+
+include 'pure-gradle-api'
+include 'pure-gradle-core'
+include 'pure-gradle-start'
+
