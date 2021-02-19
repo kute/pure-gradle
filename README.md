@@ -137,6 +137,7 @@ implementation fileTree('libs')
 implementation fileTree('libs') {
     include '*.jar'
 }
+// java-library插件提供
 api 'org.springframework:spring-core:2.5', 'org.springframework:spring-aop:2.5'
 runtimeOnly(
         [group: 'org.springframework', name: 'spring-core', version: '2.5'],

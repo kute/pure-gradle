@@ -1,7 +1,6 @@
 plugins {
     /* assemble、build和jar等Task都是java插件引入的 */
     id 'java'
-    id 'java-library'
     /*
      * 1、支持打包成可执行应用的插件
      * 2、https://docs.gradle.org/current/userguide/application_plugin.html
@@ -9,11 +8,6 @@ plugins {
      */
     id 'application'
     id 'org.springframework.boot'
-    /*
-    * https://plugins.gradle.org/plugin/io.spring.dependency-management
-    *
-    */
-    id 'io.spring.dependency-management'
 }
 
 description = "pure-gradle-start"

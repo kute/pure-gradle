@@ -19,42 +19,6 @@ buildscript {
     }
 }
 
-/*plugins {
-    *//*
-    * https://plugins.gradle.org/plugin/io.spring.dependency-management
-    * https://docs.spring.io/dependency-management-plugin/docs/current-SNAPSHOT/reference/html/
-    *//*
-    id 'io.spring.dependency-management'
-}
-
-*//**
- * 'io.spring.dependency-management' 插件的依赖管理配置
- *//*
-dependencyManagement {
-    dependencies {
-        // 声明单个依赖的版本
-        dependency group: 'com.google.guava', name: 'guava', version: '30.1-jre'
-
-        // 依赖排除
-        *//*dependency('org.springframework:spring-core:5.3.3') {
-            exclude 'commons-logging:commons-logging'
-        }*//*
-
-        // 声明多个
-        dependencySet(group: 'org.slf4j', version: '1.7.7') {
-            entry 'slf4j-api'
-            entry 'slf4j-simple'
-        }
-
-        dependencySet(group: 'org.springframework', version: '5.3.3') {
-            entry('spring-core') {
-                exclude group: 'commons-logging', name: 'commons-logging'
-            }
-        }
-
-    }
-}*/
-
 apply from: 'config.gradle'
 
 def versions = rootProject.ext.versions
@@ -65,12 +29,25 @@ println '************统一版本管理****************'
 description = "Pure gradle Build"
 defaultTasks 'build'
 
+ext {
+    // 定义一些其他的属性
+}
+
+// 1. allproject 写法 一
+configure(allprojects) { project ->
+    println "allproject另一种写法：$project"
+}
+
+// 2. allproject 写法二
 // 用于多项目构建，包括子module的仓库地址
-allprojects {
+gradle.allprojects {
+//configure(allprojects) { project2 ->
 
     // 声明版本
     group = 'com.kute'
     version = '${pureVersion}'
+
+    println "当前工程 $project"
 
     // 构建生命周期监控，可以在每个项目中单独配置，也可以在allprojects中统一配置
     beforeEvaluate { project ->
@@ -86,6 +63,44 @@ allprojects {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    /**
+     * 'io.spring.dependency-management' 插件的依赖管理配置
+     */
+    apply plugin: "io.spring.dependency-management"
+    dependencyManagement {
+
+        imports {
+            mavenBom "com.fasterxml.jackson:jackson-bom:2.12.1"
+            mavenBom "io.netty:netty-bom:4.1.59.Final"
+            mavenBom "io.projectreactor:reactor-bom:2020.0.4"
+        }
+
+        dependencies {
+            // 声明单个依赖的版本
+            dependency group: 'com.google.guava', name: 'guava', version: "$guavaVersion"
+
+            dependency group: 'junit', name: 'junit', version: '4.1.2'
+
+            // 依赖排除
+//            dependency('org.springframework:spring-core:5.3.3') {
+//                exclude 'commons-logging:commons-logging'
+//            }
+
+            // 依赖集合
+            dependencySet(group: 'org.slf4j', version: '1.7.7') {
+                entry 'slf4j-api'
+                entry 'slf4j-simple'
+            }
+            // 依赖集合排除
+            dependencySet(group: 'org.springframework', version: "${springVersion}") {
+                entry('spring-core') {
+                    exclude group: 'commons-logging', name: 'commons-logging'
+                }
+            }
+        }
+    }
+
 }
 
 /* tasks */

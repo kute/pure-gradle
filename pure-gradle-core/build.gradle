@@ -6,5 +6,7 @@ dependencies {
     implementation(project(':pure-gradle-api')) {
         because 'core依赖api接口定义'
     }
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit'
+
+    implementation 'com.google.guava:guava'
 }

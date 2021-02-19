@@ -25,7 +25,10 @@ pluginManagement {
     // 配置默认的插件版本
     plugins {
         id 'org.springframework.boot' version "${springBootVersion}"
-        //
+        /**
+         * https://plugins.gradle.org/plugin/io.spring.dependency-management
+         * https://docs.spring.io/dependency-management-plugin/docs/current-SNAPSHOT/reference/html/
+         */
         id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
         // 用于构建审视，可视化分析构建过程：https://docs.gradle.com/enterprise/gradle-plugin/
         id "com.gradle.enterprise" version "${gradleEnterpriseVersion}"
@@ -66,6 +69,8 @@ gradleEnterprise {
 }
 
 rootProject.name = 'pure-gradle'
+
+println 'settings.gradle在初始化阶段执行'
 
 settings.gradle.projectsLoaded {
     gradleEnterprise {
