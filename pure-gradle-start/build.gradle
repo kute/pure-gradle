@@ -15,11 +15,11 @@ description = "pure-gradle-start"
 /*依赖相关*/
 
 // 依赖scope配置
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
+//configurations {
+//    compileOnly {
+//        extendsFrom annotationProcessor
+//    }
+//}
 
 dependencies {
     implementation(project(':pure-gradle-core')) {
@@ -62,4 +62,8 @@ dependencies {
 application {
     mainClass = 'com.kute.puregradle.PureGradleApplication'
     applicationDefaultJvmArgs = ['-Dgreeting.language=en']
+}
+
+bootJar {
+    archiveFileName = "pure-gradle.jar"
 }

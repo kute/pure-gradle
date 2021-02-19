@@ -38,7 +38,6 @@ pluginManagement {
 plugins {
     id "com.gradle.enterprise"
 }
-
 // 构建审视配置
 gradleEnterprise {
     // configuration

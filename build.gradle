@@ -13,6 +13,7 @@ buildscript {
     // 构建时所需要的插件或者是其他的依赖
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'io.spring.gradle:dependency-management-plugin:${springDependencyManagementVersion}'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -43,9 +44,11 @@ configure(allprojects) { project ->
 gradle.allprojects {
 //configure(allprojects) { project2 ->
 
-    // 声明版本
-    group = 'com.kute'
-    version = '${pureVersion}'
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    // quality check
+    apply plugin: 'pmd'
 
     println "当前工程 $project"
 
@@ -60,9 +63,38 @@ gradle.allprojects {
     // 设定全局编码 以及java版本
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    dependencies {
+        pmd 'com.alibaba.p3c:p3c-pmd:2.1.1'
+    }
+
+    pmd {
+        consoleOutput = true
+        reportsDir = file("build/reports/pmd")
+        ruleSets = [
+//                'java-ali-comment',
+//                'java-ali-concurrent',
+//                'java-ali-constant',
+                'java-ali-exception',
+//                'java-ali-flowcontrol',
+//                'java-ali-naming',
+//                'java-ali-oop',
+//                'java-ali-orm',
+//                'java-ali-other',
+//                'java-ali-set',
+        ]
+    }
+
+}
+
+subprojects {
+    // 声明版本
+    group = 'com.kute'
+    version = "${pureVersion}"
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     /**
      * 'io.spring.dependency-management' 插件的依赖管理配置
@@ -74,6 +106,8 @@ gradle.allprojects {
             mavenBom "com.fasterxml.jackson:jackson-bom:2.12.1"
             mavenBom "io.netty:netty-bom:4.1.59.Final"
             mavenBom "io.projectreactor:reactor-bom:2020.0.4"
+            mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudDependencyVersion"
         }
 
         dependencies {
@@ -101,6 +135,10 @@ gradle.allprojects {
         }
     }
 
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+    }
 }
 
 /* tasks */
