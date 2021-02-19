@@ -1,8 +1,7 @@
+// gradle脚本自身所需要的构建的环境
 buildscript {
     // 定义变量
     ext {
-        springboot_version = "2.4.2"
-        kotlin_version = '1.3.72'
         ALI_REPOSITORY_URL = 'https://maven.aliyun.com/repository/public/'
         ALI_REPOSITORY_PLUGIN_URL = 'https://maven.aliyun.com/repository/gradle-plugin'
     }
@@ -13,26 +12,55 @@ buildscript {
 
     // 构建时所需要的插件或者是其他的依赖
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springboot_version}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
-// 这里定义的一些属性 可以在sub module中通过 rootProject.ext.<attribute>访问
-// 也可以在外部定义一个文件 config.gradle，名字随意，然后 在此文件中 apply from: 'config.gradle'
-ext {
-    a = '1'
+/*plugins {
+    *//*
+    * https://plugins.gradle.org/plugin/io.spring.dependency-management
+    * https://docs.spring.io/dependency-management-plugin/docs/current-SNAPSHOT/reference/html/
+    *//*
+    id 'io.spring.dependency-management'
 }
-println rootProject.ext.a
+
+*//**
+ * 'io.spring.dependency-management' 插件的依赖管理配置
+ *//*
+dependencyManagement {
+    dependencies {
+        // 声明单个依赖的版本
+        dependency group: 'com.google.guava', name: 'guava', version: '30.1-jre'
+
+        // 依赖排除
+        *//*dependency('org.springframework:spring-core:5.3.3') {
+            exclude 'commons-logging:commons-logging'
+        }*//*
+
+        // 声明多个
+        dependencySet(group: 'org.slf4j', version: '1.7.7') {
+            entry 'slf4j-api'
+            entry 'slf4j-simple'
+        }
+
+        dependencySet(group: 'org.springframework', version: '5.3.3') {
+            entry('spring-core') {
+                exclude group: 'commons-logging', name: 'commons-logging'
+            }
+        }
+
+    }
+}*/
 
 apply from: 'config.gradle'
-println rootProject.ext.b
-println rootProject.ext.others.c
-println rootProject.ext.others.d
-println rootProject.ext.e
 
+def versions = rootProject.ext.versions
+println '************统一版本管理****************'
+println versions
+println '************统一版本管理****************'
 
 description = "Pure gradle Build"
 defaultTasks 'build'
@@ -50,6 +78,13 @@ allprojects {
     }
     afterEvaluate { project, state ->
         println "$project 评估是否成功：${state.failure == null}"
+    }
+
+    // 设定全局编码 以及java版本
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
