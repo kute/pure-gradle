@@ -26,9 +26,9 @@ dependencies {
         because 'start依赖core module'
     }
     // 这里不用写版本号，因为plugin里有依赖管理的插件
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly('org.projectlombok:lombok')
-    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation('org.hibernate:hibernate') {
